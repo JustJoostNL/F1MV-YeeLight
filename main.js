@@ -49,17 +49,22 @@ async function getTimingData(){
 
 }
 
-async function controlLights(brightness, color) {
+async function controlLights(brightness, r, g, b) {
     const brightnessValue = brightness;
-    const colorValue = color;
 
     allLights.forEach((light) => {
         const bulb = new Bulb(light);
-            bulb.connect();
-            bulb.color(colorValue)
-            bulb.brightness(brightnessValue);
-            bulb.onn();
-            bulb.disconnect();
+        bulb.on('connected', (lamp) => {
+            try {
+                lamp.color(r,g,b);
+                lamp.brightness(brightnessValue);
+                lamp.onn();
+                lamp.disconnect();
+            } catch (err) {
+                console.log(err)
+            }
+        });
+        bulb.connect();
     });
 }
 
