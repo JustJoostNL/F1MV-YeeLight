@@ -1,0 +1,13 @@
+{
+  "name": "F1MV-YeeLight",
+  "version": "1.0.0",
+  "description": "Connect your YeeLights to your F1MV",
+  "main": "main.js",
+  "scripts": {
+    "start": "node main.js"
+  },
+  "dependencies": {
+    "node-fetch": "^3.2.10",
+    "yeelight.io": "^1.1.7"
+  }
+}
