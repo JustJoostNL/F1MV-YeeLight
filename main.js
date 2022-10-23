@@ -53,14 +53,14 @@ async function controlLights(brightness, color) {
     const brightnessValue = brightness;
     const colorValue = color;
 
-allLights.forEach((light) => {
-    const bulb = new Bulb(light);
-        bulb.connect();
-        bulb.color(colorValue)
-        bulb.brightness(brightnessValue);
-        bulb.onn();
-        bulb.disconnect();
-});
+    allLights.forEach((light) => {
+        const bulb = new Bulb(light);
+            bulb.connect();
+            bulb.color(colorValue)
+            bulb.brightness(brightnessValue);
+            bulb.onn();
+            bulb.disconnect();
+    });
 }
 
 
