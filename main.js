@@ -24,6 +24,8 @@ const blinkWhenSafetyCar = config.YeeLights.Settings.blinkWhenSafetyCar;
 const blinkWhenVSC = config.YeeLights.Settings.blinkWhenVSC;
 const blinkWhenVSCEnding = config.YeeLights.Settings.blinkWhenVSCEnding;
 
+const timesBlinking = config.YeeLights.Settings.timesBlinking;
+
 const allLights = config.YeeLights.lights;
 
 
@@ -45,8 +47,7 @@ async function getTimingData(){
                 console.log("Green")
                 await controlLightsOn(brightnessSetting, greenColor.r, greenColor.g, greenColor.b);
                 if(blinkWhenGreenFlag) {
-                    // blink the lights 5 times async
-                    for (let i = 0; i < 5; i++) {
+                    for (let i = 0; i < timesBlinking; i++) {
                         await controlLightsOff();
                         await sleep(timeBetweenBlinks);
                         await controlLightsOn(brightnessSetting, greenColor.r, greenColor.g, greenColor.b);
@@ -59,7 +60,7 @@ async function getTimingData(){
                 console.log("Yellow")
                 await controlLightsOn(brightnessSetting, yellowColor.r, yellowColor.g, yellowColor.b);
                 if(blinkWhenYellowFlag) {
-                    for (let i = 0; i < 5; i++) {
+                    for (let i = 0; i < timesBlinking; i++) {
                         await controlLightsOff();
                         await sleep(timeBetweenBlinks);
                         await controlLightsOn(brightnessSetting, yellowColor.r, yellowColor.g, yellowColor.b);
@@ -72,7 +73,7 @@ async function getTimingData(){
                 console.log("SC")
                 await controlLightsOn(brightnessSetting, safetyCarColor.r, safetyCarColor.g, safetyCarColor.b);
                 if(blinkWhenSafetyCar) {
-                    for (let i = 0; i < 5; i++) {
+                    for (let i = 0; i < timesBlinking; i++) {
                         await controlLightsOff();
                         await sleep(timeBetweenBlinks);
                         await controlLightsOn(brightnessSetting, safetyCarColor.r, safetyCarColor.g, safetyCarColor.b);
@@ -85,7 +86,7 @@ async function getTimingData(){
                 console.log("Red")
                 await controlLightsOn(brightnessSetting, redColor.r, redColor.g, redColor.b);
                 if(blinkWhenRedFlag) {
-                    for (let i = 0; i < 5; i++) {
+                    for (let i = 0; i < timesBlinking; i++) {
                         await controlLightsOff();
                         await sleep(timeBetweenBlinks);
                         await controlLightsOn(brightnessSetting, redColor.r, redColor.g, redColor.b);
@@ -98,7 +99,7 @@ async function getTimingData(){
                 console.log("VCS")
                 await controlLightsOn(brightnessSetting, vscColor.r, vscColor.g, vscColor.b);
                 if(blinkWhenVSC) {
-                    for (let i = 0; i < 5; i++) {
+                    for (let i = 0; i < timesBlinking; i++) {
                         await controlLightsOff();
                         await sleep(timeBetweenBlinks);
                         await controlLightsOn(brightnessSetting, vscColor.r, vscColor.g, vscColor.b);
@@ -111,7 +112,7 @@ async function getTimingData(){
                 console.log("VSC Ending")
                 await controlLightsOn(brightnessSetting, vscEndingColor.r, vscEndingColor.g, vscEndingColor.b);
                 if(blinkWhenVSCEnding) {
-                    for (let i = 0; i < 5; i++) {
+                    for (let i = 0; i < timesBlinking; i++) {
                         await controlLightsOff();
                         await sleep(timeBetweenBlinks);
                         await controlLightsOn(brightnessSetting, vscEndingColor.r, vscEndingColor.g, vscEndingColor.b);
