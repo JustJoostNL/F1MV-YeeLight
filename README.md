@@ -18,7 +18,7 @@
   <p align="center">
     Connect your YeeLights to your F1MV
     <br />
-    <a href="https://github.com/koningcool/F1MV-YeeLight/wiki/First-Time-Configuration"><strong>Explore the docs »</strong></a>
+    <a href="https://github.com/koningcool/F1MV-YeeLight/wiki/"><strong>Explore the wiki »</strong></a>
     <br />
     <br />
     <a href="https://github.com/koningcool/F1MV-YeeLight/issues">Report Bug</a>
