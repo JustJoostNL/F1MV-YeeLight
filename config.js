@@ -1,8 +1,8 @@
 const config = {
     //begin of config file
 
-    // put the url of the livetiming api here (USE THE IP OF YOUR SYSTEM, NOT LOCALHOST)
-    TrackStatusURL: 'http://youriphere:10101/api/v1/live-timing/TrackStatus',
+    // put the url of the livetiming api here (USE THE IP OF YOUR SYSTEM, NOT LOCALHOST) (Eg. http://192.168.1.33/api/v1/live-timing/TrackStatus)
+    LiveTimingURL: 'http://192.168.1.22:10101/api/v2/live-timing/state/SessionStatus,TrackStatus',
     YeeLights: {
         // put all the ips of your lights here (use quotes)
         // if you have multiple lights seperated by a comma (Eg: "192.168.1.1", "192.168.1.2")
@@ -21,6 +21,8 @@ const config = {
         // put the time between each blink here (in ms)
         // don't put it too low, or it will not work!
         timeBetweenBlinks: 600,
+        // automatically turn off the lights after the session is over
+        turnOffWhenSessionEnds: true,
 
         // put the color of your lights here (0-255)
         green: {
@@ -54,7 +56,19 @@ const config = {
             b: 0
 
         }
-    }
+    },
+
+    //analytics
+    // if you want to help me improve this project, you can enable analytics
+    // this will send me some data about how many times the lights have been switched on and off, etc...
+    // this will not send any personal data
+    // if you want to disable this, set this to false
+
+    analytics: true,
+
+    //debug mode
+    // if you want to see more logs, set this to true
+    debug: false
 }
 
         //end of config file

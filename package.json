@@ -1,6 +1,6 @@
 {
   "name": "F1MV-YeeLight",
-  "version": "1.0.0",
+  "version": "1.5.0",
   "description": "Connect your YeeLights to your F1MV",
   "main": "main.js",
   "scripts": {
@@ -8,9 +8,13 @@
     "package": "electron-forge package",
     "make": "electron-forge make"
   },
+  "build": {
+    "asar": true
+  },
   "dependencies": {
     "electron-squirrel-startup": "^1.0.0",
     "node-fetch": "^2.6.1",
+    "process": "^0.11.10",
     "yeelight.io": "^1.1.7"
   },
   "devDependencies": {
