@@ -153,7 +153,7 @@ Distributed under the GNU General Public License v3.0. See `LICENSE.md` for more
 ## Acknowledgments
 
 * [Thanks to MultiViewer For F1 for the amazing software!](https://beta.f1mv.com/)
-* [Thanks to @StephanBruh for the idea and helping with testing!](https://github.com/StephanBruh)
+* [Thanks to @StephanBruh for the idea and testing!](https://github.com/StephanBruh)
 
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
