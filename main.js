@@ -80,6 +80,7 @@ async function getTimingData() {
     const data = await a.json();
     const trackStatus = data.TrackStatus.Status;
     const sessionStatus = data.SessionStatus.Status;
+    //check = trackStatus;
     if(debugPreference) {
         console.log(data);
     }
@@ -124,89 +125,71 @@ async function getTimingData() {
 
     }
 
-    if (check !== trackStatus && sessionStatus === "Started") {
+    if (check !== trackStatus && sessionStatus !== "Ends" && sessionStatus !== "Finalised") {
         switch (trackStatus) {
             case "1":
                 console.log("Green")
                 flagSwitchCounter++;
-                await controlLightsOn(brightnessSetting, greenColor.r, greenColor.g, greenColor.b);
+                if(blinkWhenGreenFlag === false) {
+                    await controlLightsOn(brightnessSetting, greenColor.r, greenColor.g, greenColor.b);
+                }
                 if (blinkWhenGreenFlag) {
-                    for (let i = 0; i < timesBlinking; i++) {
-                        await controlLightsOff();
-                        await sleep(timeBetweenBlinks);
-                        await controlLightsOn(brightnessSetting, greenColor.r, greenColor.g, greenColor.b);
-                        await sleep(timeBetweenBlinks);
-                    }
+                    await blink(brightnessSetting, greenColor.r, greenColor.g, greenColor.b);
                 }
                 check = trackStatus;
                 break;
             case "2":
                 console.log("Yellow")
                 flagSwitchCounter++;
+                if(blinkWhenYellowFlag === false) {
                 await controlLightsOn(brightnessSetting, yellowColor.r, yellowColor.g, yellowColor.b);
+                }
                 if (blinkWhenYellowFlag) {
-                    for (let i = 0; i < timesBlinking; i++) {
-                        await controlLightsOff();
-                        await sleep(timeBetweenBlinks);
-                        await controlLightsOn(brightnessSetting, yellowColor.r, yellowColor.g, yellowColor.b);
-                        await sleep(timeBetweenBlinks);
-                    }
+                    await blink(brightnessSetting, yellowColor.r, yellowColor.g, yellowColor.b);
                 }
                 check = trackStatus;
                 break;
             case "4":
                 console.log("SC")
                 flagSwitchCounter++;
+                if(blinkWhenSafetyCar === false) {
                 await controlLightsOn(brightnessSetting, safetyCarColor.r, safetyCarColor.g, safetyCarColor.b);
+                }
                 if (blinkWhenSafetyCar) {
-                    for (let i = 0; i < timesBlinking; i++) {
-                        await controlLightsOff();
-                        await sleep(timeBetweenBlinks);
-                        await controlLightsOn(brightnessSetting, safetyCarColor.r, safetyCarColor.g, safetyCarColor.b);
-                        await sleep(timeBetweenBlinks);
-                    }
+                    await blink(brightnessSetting, safetyCarColor.r, safetyCarColor.g, safetyCarColor.b);
                 }
                 check = trackStatus;
                 break;
             case "5":
                 console.log("Red")
                 flagSwitchCounter++;
+                if(blinkWhenRedFlag === false) {
                 await controlLightsOn(brightnessSetting, redColor.r, redColor.g, redColor.b);
+                }
                 if (blinkWhenRedFlag) {
-                    for (let i = 0; i < timesBlinking; i++) {
-                        await controlLightsOff();
-                        await sleep(timeBetweenBlinks);
-                        await controlLightsOn(brightnessSetting, redColor.r, redColor.g, redColor.b);
-                        await sleep(timeBetweenBlinks);
-                    }
+                    await blink(brightnessSetting, redColor.r, redColor.g, redColor.b);
                 }
                 check = trackStatus;
                 break;
             case "6":
                 console.log("VCS")
                 flagSwitchCounter++;
+                if(blinkWhenVSC === false) {
                 await controlLightsOn(brightnessSetting, vscColor.r, vscColor.g, vscColor.b);
+                }
                 if (blinkWhenVSC) {
-                    for (let i = 0; i < timesBlinking; i++) {
-                        await controlLightsOff();
-                        await sleep(timeBetweenBlinks);
-                        await controlLightsOn(brightnessSetting, vscColor.r, vscColor.g, vscColor.b);
-                        await sleep(timeBetweenBlinks);
-                    }
+                    await blink(brightnessSetting, vscColor.r, vscColor.g, vscColor.b);
                 }
                 check = trackStatus;
                 break;
             case "7":
                 console.log("VSC Ending")
                 flagSwitchCounter++;
+                if(blinkWhenVSCEnding === false) {
                 await controlLightsOn(brightnessSetting, vscEndingColor.r, vscEndingColor.g, vscEndingColor.b);
+                }
                 if (blinkWhenVSCEnding) {
-                    for (let i = 0; i < timesBlinking; i++) {
-                        await controlLightsOff();
-                        await sleep(timeBetweenBlinks);
-                        await controlLightsOn(brightnessSetting, vscEndingColor.r, vscEndingColor.g, vscEndingColor.b);
-                        await sleep(timeBetweenBlinks);
-                    }
+                    await blink(brightnessSetting, vscEndingColor.r, vscEndingColor.g, vscEndingColor.b);
                 }
                 check = trackStatus;
                 break;
@@ -257,6 +240,31 @@ async function controlLightsOff() {
         });
         bulb.connect();
     });
+}
+
+let cd = false;
+async function blink(brightness, color) {
+    if (!cd) {
+        cd = true;
+        for (let i = 1; i <= timesBlinking; i++) {
+            console.log(`count: ${i}/${timesBlinking}`)
+            await controlLightsOn(brightness, color);
+            console.log(Math.floor(new Date().getTime() / 1000))
+            await sleep(timeBetweenBlinks);
+            await controlLightsOn(brightness, color);
+            console.log(Math.floor(new Date().getTime() / 1000))
+            await sleep(timeBetweenBlinks);
+            await controlLightsOn(brightness, color);
+            console.log(Math.floor(new Date().getTime() / 1000))
+            await sleep(timeBetweenBlinks);
+            await console.log(`${i}/${timesBlinking} done blinking`)
+
+            if (i === timesBlinking) {
+                console.log('done')
+                cd = false;
+            }
+        }
+    }
 }
 
 

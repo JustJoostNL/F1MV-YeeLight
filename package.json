@@ -2,6 +2,7 @@
   "name": "F1MV-YeeLight",
   "version": "1.5.0",
   "description": "Connect your YeeLights to your F1MV",
+  "author": "koningcool",
   "main": "main.js",
   "scripts": {
     "start": "electron-forge start",
