@@ -3,6 +3,8 @@
 const { autoUpdater } = require("electron-updater")
 const { app, BrowserWindow, dialog, ipcMain  } = require('electron')
 const config = require('./config');
+const http = require('http');
+const https = require('https');
 const { Bulb } = require('yeelight.io');
 const fetch = require('node-fetch').default;
 const process = require('process');
@@ -96,8 +98,16 @@ app.on('window-all-closed',  async() => {
 })
 
 ipcMain.on('simulate', (event, arg) => {
+    simulateFlag(arg)
+})
+
+ipcMain.on('updatecheck', (event, arg) => {
+    console.log(autoUpdater.checkForUpdates())
+})
+
+async function simulateFlag(arg) {
     console.log(arg)
-  })
+}
 
 
 async function sendAnalytics() {
@@ -142,8 +152,6 @@ async function checkF1MV() {
     const data = await a.json();
 
     if (!Object.keys(data).length) {
-        win.webContents.send('f1mvapi', 'xd')
-        console.log('send')
         return false;
     }
 
@@ -154,10 +162,8 @@ async function getTimingData() {
     let F1MVApi = await checkF1MV();
 
     if (!F1MVApi) {
-        win.webContents.send('f1mvapi', 'xd')
         return true;
     }
-
 
 
     let a = await fetch(url, {
@@ -332,10 +338,32 @@ async function controlLightsOff() {
 }
 
 
-getTimingData().catch((err) => {
-    console.log(err);
-});
-// setInterval(getTimingData, 100);
+setInterval(function(){
+    getTimingData().catch((err) => {
+        console.log(err);
+    });
+}, 100);
+
+setTimeout(() => {
+    checkApis()
+}, 500);
+setInterval(function() {
+    checkApis()
+}, 5000)
+
+function checkApis() {
+    https.get(analyticsURL, function (res) {
+        win.webContents.send('joostapi', 'online')
+    }).on('error', function(e) {
+        win.webContents.send('joostapi', 'offline')
+    });
+
+    http.get(url, function (res) {
+        win.webContents.send('f1mvapi', 'online')
+    }).on('error', function(e) {
+        win.webContents.send('f1mvapi', 'offline')
+    });
+}
 
 autoUpdater.on('update-downloaded', (event, releaseNotes, releaseName) => {
     const dialogOpts = {

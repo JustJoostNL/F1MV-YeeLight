@@ -1,7 +1,27 @@
 const { ipcRenderer } = require('electron');
+$(function() {
+    ipcRenderer.on('f1mvapi', (event, arg) => {
+        console.log(arg)
+        if (arg == 'online') {
+            $('#f1mv').find('.status').removeClass('error').addClass('success')
+        }
 
-ipcRenderer.on('f1mvapi', (event, arg) => {
-    alert(arg) // prints "pong"
+        if (arg == 'offline') {
+            $('#f1mv').find('.status').removeClass('success').addClass('error')
+        }
+    })
+
+    ipcRenderer.on('joostapi', (event, arg) => {
+        console.log(arg)
+        if (arg == 'online') {
+            $('#joostapi').find('.status').removeClass('error').addClass('success')
+        }
+
+        if (arg == 'offline') {
+            $('#joostapi').find('.status').removeClass('success').addClass('error')
+        }
+
+    })
 })
 
 
@@ -19,6 +39,8 @@ function simulateYellow() {
         html: 'Yellow flag event sent',
         displayLength: 2000
     })
+
+    ipcRenderer.send('simulate', 'yellow')
 }
 
 function simulateRed() {
@@ -26,6 +48,8 @@ function simulateRed() {
         html: 'Red flag event sent',
         displayLength: 2000
     })
+
+    ipcRenderer.send('simulate', 'red')
 }
 
 function simulateSC() {
@@ -33,6 +57,8 @@ function simulateSC() {
         html: 'Safety car event sent',
         displayLength: 2000
     })
+
+    ipcRenderer.send('simulate', 'sc')
 }
 
 function simulateVSC() {
@@ -40,6 +66,8 @@ function simulateVSC() {
         html: 'VSC event sent',
         displayLength: 2000
     })
+
+    ipcRenderer.send('simulate', 'vsc')
 }
 
 function simulateVSCEnding() {
@@ -47,6 +75,8 @@ function simulateVSCEnding() {
         html: 'VSC Ending event sent',
         displayLength: 2000
     })
+
+    ipcRenderer.send('simulate', 'vcsEnding')
 }
 
 function checkForUpdates() {
@@ -54,4 +84,6 @@ function checkForUpdates() {
         html: 'Checking for updates..',
         displayLength: 2000
     })
+
+    ipcRenderer.send('updatecheck', 'updatecheck')
 }
