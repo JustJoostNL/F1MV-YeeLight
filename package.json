@@ -1,59 +1,34 @@
 {
   "name": "F1MV-YeeLight",
-  "version": "1.5.0",
+  "version": "1.5.1",
   "description": "Connect your YeeLights to your F1MV",
   "author": "koningcool",
   "main": "main.js",
   "scripts": {
-    "start": "electron-forge start",
-    "package": "electron-forge package",
-    "make": "electron-forge make"
+    "start": "electron .",
+    "package": "electron-builder --dir",
+    "make": "electron-builder",
+    "postinstall": "electron-builder install-app-deps"
   },
   "build": {
-    "asar": true
+    "appId": "com.koningcool.f1mv.yeelight",
+    "productName": "F1MV-YeeLight",
+    "copyright": "Copyright © year ${author}",
+    "asar": true,
+    "asarUnpack": [
+      "config.js"
+    ],
+    "directories": {
+      "output": "out"
+    }
   },
   "dependencies": {
-    "electron-squirrel-startup": "^1.0.0",
     "node-fetch": "^2.6.1",
     "process": "^0.11.10",
     "yeelight.io": "^1.1.7"
   },
   "devDependencies": {
-    "@electron-forge/cli": "^6.0.0-beta.67",
-    "@electron-forge/maker-deb": "^6.0.0-beta.67",
-    "@electron-forge/maker-rpm": "^6.0.0-beta.67",
-    "@electron-forge/maker-squirrel": "^6.0.0-beta.67",
-    "@electron-forge/maker-zip": "^6.0.0-beta.67",
-    "electron": "^21.2.0"
-  },
-  "config": {
-    "forge": {
-      "packagerConfig": {"build": {
-        "asar": true
-      }
-      },
-      "makers": [
-        {
-          "name": "@electron-forge/maker-squirrel",
-          "config": {
-            "name": "F1MV-YeeLight"
-          }
-        },
-        {
-          "name": "@electron-forge/maker-zip",
-          "platforms": [
-            "darwin"
-          ]
-        },
-        {
-          "name": "@electron-forge/maker-deb",
-          "config": {}
-        },
-        {
-          "name": "@electron-forge/maker-rpm",
-          "config": {}
-        }
-      ]
-    }
+    "electron": "^21.2.0",
+    "electron-builder": "^23.6.0"
   }
 }

@@ -2,3 +2,6 @@
 .idea/*
 
 out/
+output/*
+output/
+output
