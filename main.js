@@ -1,11 +1,13 @@
 'use strict';
 
+const { autoUpdater } = require("electron-updater")
+const { dialog } = require('electron')
+
 const config = require('./config');
 const { Bulb } = require('yeelight.io');
 const fetch = require('node-fetch').default;
 const process = require('process');
 const url = config.LiveTimingURL
-
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
 const brightnessSetting = config.YeeLights.Settings.brightness;
@@ -297,6 +299,7 @@ app.whenReady().then(() => {
     createWindow()
 
     app.on('activate', () => {
+        autoUpdater.checkForUpdates();
         let startTime = new Date();
         if (BrowserWindow.getAllWindows().length === 0) {
             createWindow()
@@ -320,3 +323,27 @@ app.on('window-all-closed',  async() => {
 
     }
 })
+
+autoUpdater.on('update-downloaded', (event, releaseNotes, releaseName) => {
+    const dialogOpts = {
+        type: 'info',
+        buttons: ['Restart', 'Later'],
+        title: 'Application Update',
+        message: process.platform === 'win32' ? releaseNotes : releaseName,
+        detail:
+            'A new version has been downloaded. Restart the application to apply the updates.',
+    }
+
+    dialog.showMessageBox(dialogOpts).then((returnValue) => {
+        if (returnValue.response === 0) autoUpdater.quitAndInstall()
+    })
+})
+
+autoUpdater.on('error', (message) => {
+    console.error('There was a problem updating the application')
+    console.error(message)
+})
+
+setInterval(() => {
+    autoUpdater.checkForUpdates()
+}, 60000)

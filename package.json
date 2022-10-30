@@ -20,9 +20,19 @@
     ],
     "directories": {
       "output": "out"
+    },
+    "win": {
+      "publish": ["github"]
+    },
+    "mac": {
+      "publish": ["github"]
+    },
+    "linux": {
+      "publish": ["github"]
     }
   },
   "dependencies": {
+    "electron-updater": "^5.3.0",
     "node-fetch": "^2.6.1",
     "process": "^0.11.10",
     "yeelight.io": "^1.1.7"
