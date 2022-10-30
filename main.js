@@ -254,18 +254,18 @@ async function controlLightsOff() {
 }
 
 let cd = false;
-async function blink(brightness, color) {
+async function blink(brightness, r, g, b) {
     if (!cd) {
         cd = true;
         for (let i = 1; i <= timesBlinking; i++) {
             console.log(`count: ${i}/${timesBlinking}`)
-            await controlLightsOn(brightness, color);
+            await controlLightsOn(brightness, r, g, b);
             console.log(Math.floor(new Date().getTime() / 1000))
             await sleep(timeBetweenBlinks);
-            await controlLightsOn(brightness, color);
+            await controlLightsOn(brightness, r, g, b);
             console.log(Math.floor(new Date().getTime() / 1000))
             await sleep(timeBetweenBlinks);
-            await controlLightsOn(brightness, color);
+            await controlLightsOn(brightness, r, g, b);
             console.log(Math.floor(new Date().getTime() / 1000))
             await sleep(timeBetweenBlinks);
             await console.log(`${i}/${timesBlinking} done blinking`)
@@ -276,6 +276,11 @@ async function blink(brightness, color) {
             }
         }
     }
+}
+
+// a function that turns all the lights on and green
+async function turnOnLights(color) {
+    await controlLightsOn(brightnessSetting, color, color, color);
 }
 
 
