@@ -279,8 +279,13 @@ async function blink(brightness, r, g, b) {
 }
 
 // a function that turns all the lights on and green
-async function turnOnLights(color) {
-    await controlLightsOn(brightnessSetting, color, color, color);
+async function simulateGreenFlag() {
+    if(blinkWhenGreenFlag === false) {
+        await controlLightsOn(brightnessSetting, greenColor.r, greenColor.g, greenColor.b);
+    }
+    if (blinkWhenGreenFlag) {
+        await blink(brightnessSetting, greenColor.r, greenColor.g, greenColor.b);
+    }
 }
 
 
