@@ -50,9 +50,16 @@ autoUpdater.channel = config.YeeLights.channel;
 
 async function sendAnalytics() {
     if(analyticsPreference) {
-        //console.log("Sending analytics...");
+        const currentTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: "2-digit", hour12: false });
+        const currentDate = new Date()
+        const day = currentDate.getDate()
+        const month = currentDate.getMonth() + 1
+        const year = currentDate.getFullYear()
+        const date = day + "-" + month + "-" + year
 
         const data = {
+            "time-of-sending": currentTime,
+            "date-of-sending": date,
             "config": config,
             "lights-on-counter": lightsOnCounter,
             "light-off-counter": lightsOffCounter,

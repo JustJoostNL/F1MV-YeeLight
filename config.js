@@ -20,7 +20,7 @@ const config = {
         blinkWhenVSCEnding: false,
         // put the time between each blink here (in ms)
         // don't put it too low, or it will not work!
-        timeBetweenBlinks: 600,
+        timeBetweenBlinks: 1500,
         // automatically turn off the lights after the session is over
         turnOffWhenSessionEnds: true,
 
