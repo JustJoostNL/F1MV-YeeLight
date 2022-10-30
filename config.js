@@ -58,6 +58,9 @@ const config = {
         }
     },
 
+    // update channel, you can choose between "latest", "beta" and "alpha"
+    updateChannel: "latest",
+
     //analytics
     // if you want to help me improve this project, you can enable analytics
     // this will send me some data about how many times the lights have been switched on and off, etc...

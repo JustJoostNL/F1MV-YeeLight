@@ -14,6 +14,7 @@
     "appId": "com.koningcool.f1mv.yeelight",
     "productName": "F1MV-YeeLight",
     "copyright": "Copyright © year ${author}",
+    "generateUpdatesFilesForAllChannels": true,
     "asar": true,
     "asarUnpack": [
       "config.js"

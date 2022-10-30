@@ -45,6 +45,8 @@ const allLights = config.YeeLights.lights;
 
 let check;
 
+autoUpdater.channel = config.YeeLights.channel;
+
 
 async function sendAnalytics() {
     if(analyticsPreference) {
