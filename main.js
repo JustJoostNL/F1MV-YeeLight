@@ -1,8 +1,7 @@
 'use strict';
 
 const { autoUpdater } = require("electron-updater")
-const { dialog } = require('electron')
-
+const { app, BrowserWindow, dialog, ipcMain  } = require('electron')
 const config = require('./config');
 const { Bulb } = require('yeelight.io');
 const fetch = require('node-fetch').default;
@@ -45,7 +44,60 @@ const allLights = config.YeeLights.lights;
 
 let check;
 
+let win;
+
 autoUpdater.channel = config.YeeLights.channel;
+
+function createWindow () {
+    if(debugPreference) {
+        console.log("Creating window...");
+    }
+    win = new BrowserWindow({
+        width: 1700,
+        height: 1200,
+        webPreferences: {
+            nodeIntegration: true,
+            contextIsolation: false,
+        }
+    })
+
+    win.loadFile('index.html')
+
+    win.webContents.openDevTools()
+}
+
+app.whenReady().then(() => {
+    createWindow()
+
+    app.on('activate', () => {
+        autoUpdater.checkForUpdates();
+        let startTime = new Date();
+        if (BrowserWindow.getAllWindows().length === 0) {
+            createWindow()
+        }
+    })
+})
+
+app.on('window-all-closed',  async() => {
+
+    console.log("Closing window and sending analytics...");
+
+    if (process.platform !== 'darwin') {
+        if(analyticsPreference === true || analyticsSend === false) {
+            await sendAnalytics().catch((err) => {
+                analyticsSend = true;
+                console.log(err);
+            });
+        }
+        app.quit()
+
+
+    }
+})
+
+ipcMain.on('simulate', (event, arg) => {
+    console.log(arg)
+  })
 
 
 async function sendAnalytics() {
@@ -79,9 +131,35 @@ async function sendAnalytics() {
     }
 }
 
+async function checkF1MV() {
+    let a = await fetch(url, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    });
 
+    const data = await a.json();
+
+    if (!Object.keys(data).length) {
+        win.webContents.send('f1mvapi', 'xd')
+        console.log('send')
+        return false;
+    }
+
+    return true;
+}
 
 async function getTimingData() {
+    let F1MVApi = await checkF1MV();
+
+    if (!F1MVApi) {
+        win.webContents.send('f1mvapi', 'xd')
+        return true;
+    }
+
+
+
     let a = await fetch(url, {
         method: 'GET',
         headers: {
@@ -213,23 +291,23 @@ async function controlLightsOn(brightness, r, g, b) {
     const brightnessValue = brightness;
     lightsOnCounter++;
 
-    allLights.forEach((light) => {
-        const bulb = new Bulb(light);
-        if(debugPreference) {
-            console.log("Turning on light: " + light + " with brightness: " + brightnessValue + " and color: " + r + " " + g + " " + b);
-        }
-        bulb.on('connected', (lamp) => {
-            try {
-                lamp.color(r,g,b);
-                lamp.brightness(brightnessValue);
-                lamp.onn();
-                lamp.disconnect();
-            } catch (err) {
-                console.log(err)
-            }
-        });
-        bulb.connect();
-    });
+    // allLights.forEach((light) => {
+    //     const bulb = new Bulb(light);
+    //     if(debugPreference) {
+    //         console.log("Turning on light: " + light + " with brightness: " + brightnessValue + " and color: " + r + " " + g + " " + b);
+    //     }
+    //     bulb.on('connected', (lamp) => {
+    //         try {
+    //             lamp.color(r,g,b);
+    //             lamp.brightness(brightnessValue);
+    //             lamp.onn();
+    //             lamp.disconnect();
+    //         } catch (err) {
+    //             console.log(err)
+    //         }
+    //     });
+    //     bulb.connect();
+    // });
 }
 
 
@@ -253,150 +331,11 @@ async function controlLightsOff() {
     });
 }
 
-let cd = false;
-async function blink(brightness, r, g, b) {
-    if (!cd) {
-        cd = true;
-        for (let i = 1; i <= timesBlinking; i++) {
-            console.log(`count: ${i}/${timesBlinking}`)
-            await controlLightsOn(brightness, r, g, b);
-            console.log(Math.floor(new Date().getTime() / 1000))
-            await sleep(timeBetweenBlinks);
-            await controlLightsOn(brightness, r, g, b);
-            console.log(Math.floor(new Date().getTime() / 1000))
-            await sleep(timeBetweenBlinks);
-            await controlLightsOn(brightness, r, g, b);
-            console.log(Math.floor(new Date().getTime() / 1000))
-            await sleep(timeBetweenBlinks);
-            await console.log(`${i}/${timesBlinking} done blinking`)
-
-            if (i === timesBlinking) {
-                console.log('done')
-                cd = false;
-            }
-        }
-    }
-}
-
-// a function that turns all the lights on and green
-async function simulateGreenFlag() {
-    if(blinkWhenGreenFlag === false) {
-        await controlLightsOn(brightnessSetting, greenColor.r, greenColor.g, greenColor.b);
-    }
-    if (blinkWhenGreenFlag) {
-        await blink(brightnessSetting, greenColor.r, greenColor.g, greenColor.b);
-    }
-}
-
-// a function that turns all the lights on and yellow
-async function simulateYellowFlag() {
-    if(blinkWhenYellowFlag === false) {
-        await controlLightsOn(brightnessSetting, yellowColor.r, yellowColor.g, yellowColor.b);
-    }
-    if (blinkWhenYellowFlag) {
-        await blink(brightnessSetting, yellowColor.r, yellowColor.g, yellowColor.b);
-    }
-}
-
-// a function that turns all the lights on and red
-async function simulateRedFlag() {
-    if(blinkWhenRedFlag === false) {
-        await controlLightsOn(brightnessSetting, redColor.r, redColor.g, redColor.b);
-    }
-    if (blinkWhenRedFlag) {
-        await blink(brightnessSetting, redColor.r, redColor.g, redColor.b);
-    }
-}
-
-// a function that turns all the lights on and safety car
-async function simulateSafetyCar() {
-    if(blinkWhenSafetyCar === false) {
-        await controlLightsOn(brightnessSetting, safetyCarColor.r, safetyCarColor.g, safetyCarColor.b);
-    }
-    if (blinkWhenSafetyCar) {
-        await blink(brightnessSetting, safetyCarColor.r, safetyCarColor.g, safetyCarColor.b);
-    }
-}
-
-// a function that turns all the lights on and vsc
-async function simulateVSC() {
-    if(blinkWhenVSC === false) {
-        await controlLightsOn(brightnessSetting, vscColor.r, vscColor.g, vscColor.b);
-    }
-    if (blinkWhenVSC) {
-        await blink(brightnessSetting, vscColor.r, vscColor.g, vscColor.b);
-    }
-}
-
-// a function that turns all the lights on and vsc ending
-async function simulateVSCEnding() {
-    if(blinkWhenVSCEnding === false) {
-        await controlLightsOn(brightnessSetting, vscEndingColor.r, vscEndingColor.g, vscEndingColor.b);
-    }
-    if (blinkWhenVSCEnding) {
-        await blink(brightnessSetting, vscEndingColor.r, vscEndingColor.g, vscEndingColor.b);
-    }
-}
-
-// a function that turns all the lights off
-async function simulateLightsOff() {
-    await controlLightsOff();
-}
-
 
 getTimingData().catch((err) => {
     console.log(err);
 });
-setInterval(getTimingData, 100);
-
-
-
-const { app, BrowserWindow } = require('electron')
-const path = require('path')
-
-function createWindow () {
-    if(debugPreference) {
-        console.log("Creating window...");
-    }
-    const win = new BrowserWindow({
-        width: 800,
-        height: 600,
-        webPreferences: {
-
-        }
-    })
-
-    win.loadFile('index.html')
-}
-
-app.whenReady().then(() => {
-    createWindow()
-
-    app.on('activate', () => {
-        autoUpdater.checkForUpdates();
-        let startTime = new Date();
-        if (BrowserWindow.getAllWindows().length === 0) {
-            createWindow()
-        }
-    })
-})
-
-app.on('window-all-closed',  async() => {
-
-    console.log("Closing window and sending analytics...");
-
-    if (process.platform !== 'darwin') {
-        if(analyticsPreference === true || analyticsSend === false) {
-            await sendAnalytics().catch((err) => {
-                analyticsSend = true;
-                console.log(err);
-            });
-        }
-        app.quit()
-
-
-    }
-})
+// setInterval(getTimingData, 100);
 
 autoUpdater.on('update-downloaded', (event, releaseNotes, releaseName) => {
     const dialogOpts = {
