@@ -288,6 +288,61 @@ async function simulateGreenFlag() {
     }
 }
 
+// a function that turns all the lights on and yellow
+async function simulateYellowFlag() {
+    if(blinkWhenYellowFlag === false) {
+        await controlLightsOn(brightnessSetting, yellowColor.r, yellowColor.g, yellowColor.b);
+    }
+    if (blinkWhenYellowFlag) {
+        await blink(brightnessSetting, yellowColor.r, yellowColor.g, yellowColor.b);
+    }
+}
+
+// a function that turns all the lights on and red
+async function simulateRedFlag() {
+    if(blinkWhenRedFlag === false) {
+        await controlLightsOn(brightnessSetting, redColor.r, redColor.g, redColor.b);
+    }
+    if (blinkWhenRedFlag) {
+        await blink(brightnessSetting, redColor.r, redColor.g, redColor.b);
+    }
+}
+
+// a function that turns all the lights on and safety car
+async function simulateSafetyCar() {
+    if(blinkWhenSafetyCar === false) {
+        await controlLightsOn(brightnessSetting, safetyCarColor.r, safetyCarColor.g, safetyCarColor.b);
+    }
+    if (blinkWhenSafetyCar) {
+        await blink(brightnessSetting, safetyCarColor.r, safetyCarColor.g, safetyCarColor.b);
+    }
+}
+
+// a function that turns all the lights on and vsc
+async function simulateVSC() {
+    if(blinkWhenVSC === false) {
+        await controlLightsOn(brightnessSetting, vscColor.r, vscColor.g, vscColor.b);
+    }
+    if (blinkWhenVSC) {
+        await blink(brightnessSetting, vscColor.r, vscColor.g, vscColor.b);
+    }
+}
+
+// a function that turns all the lights on and vsc ending
+async function simulateVSCEnding() {
+    if(blinkWhenVSCEnding === false) {
+        await controlLightsOn(brightnessSetting, vscEndingColor.r, vscEndingColor.g, vscEndingColor.b);
+    }
+    if (blinkWhenVSCEnding) {
+        await blink(brightnessSetting, vscEndingColor.r, vscEndingColor.g, vscEndingColor.b);
+    }
+}
+
+// a function that turns all the lights off
+async function simulateLightsOff() {
+    await controlLightsOff();
+}
+
 
 getTimingData().catch((err) => {
     console.log(err);
