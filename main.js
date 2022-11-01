@@ -10,6 +10,7 @@ const fetch = require('node-fetch').default;
 const process = require('process');
 const url = config.LiveTimingURL
 const sleep = ms => new Promise(r => setTimeout(r, ms));
+const updateURL = "https://api.github.com/repos/koningcool/F1MV-YeeLight/releases/"
 
 const brightnessSetting = config.YeeLights.Settings.brightness;
 
@@ -106,6 +107,7 @@ ipcMain.on('updatecheck', (event, arg) => {
 })
 
 async function simulateFlag(arg) {
+    win.webContents.send('log', "Simulated " + arg);
     console.log(arg)
 }
 
@@ -228,9 +230,7 @@ async function getTimingData() {
                 if(blinkWhenGreenFlag === false) {
                     await controlLightsOn(brightnessSetting, greenColor.r, greenColor.g, greenColor.b);
                 }
-                if (blinkWhenGreenFlag) {
-                    await blink(brightnessSetting, greenColor.r, greenColor.g, greenColor.b);
-                }
+                win.webContents.send('log', "Green flag detected!");
                 check = trackStatus;
                 break;
             case "2":
@@ -239,9 +239,7 @@ async function getTimingData() {
                 if(blinkWhenYellowFlag === false) {
                 await controlLightsOn(brightnessSetting, yellowColor.r, yellowColor.g, yellowColor.b);
                 }
-                if (blinkWhenYellowFlag) {
-                    await blink(brightnessSetting, yellowColor.r, yellowColor.g, yellowColor.b);
-                }
+                win.webContents.send('log', "Yellow flag detected!");
                 check = trackStatus;
                 break;
             case "4":
@@ -250,9 +248,7 @@ async function getTimingData() {
                 if(blinkWhenSafetyCar === false) {
                 await controlLightsOn(brightnessSetting, safetyCarColor.r, safetyCarColor.g, safetyCarColor.b);
                 }
-                if (blinkWhenSafetyCar) {
-                    await blink(brightnessSetting, safetyCarColor.r, safetyCarColor.g, safetyCarColor.b);
-                }
+                win.webContents.send('log', "Safety car detected!");
                 check = trackStatus;
                 break;
             case "5":
@@ -261,9 +257,7 @@ async function getTimingData() {
                 if(blinkWhenRedFlag === false) {
                 await controlLightsOn(brightnessSetting, redColor.r, redColor.g, redColor.b);
                 }
-                if (blinkWhenRedFlag) {
-                    await blink(brightnessSetting, redColor.r, redColor.g, redColor.b);
-                }
+                win.webContents.send('log', "Red flag detected!");
                 check = trackStatus;
                 break;
             case "6":
@@ -272,9 +266,7 @@ async function getTimingData() {
                 if(blinkWhenVSC === false) {
                 await controlLightsOn(brightnessSetting, vscColor.r, vscColor.g, vscColor.b);
                 }
-                if (blinkWhenVSC) {
-                    await blink(brightnessSetting, vscColor.r, vscColor.g, vscColor.b);
-                }
+                win.webContents.send('log', "Virtual safety car detected!");
                 check = trackStatus;
                 break;
             case "7":
@@ -283,9 +275,7 @@ async function getTimingData() {
                 if(blinkWhenVSCEnding === false) {
                 await controlLightsOn(brightnessSetting, vscEndingColor.r, vscEndingColor.g, vscEndingColor.b);
                 }
-                if (blinkWhenVSCEnding) {
-                    await blink(brightnessSetting, vscEndingColor.r, vscEndingColor.g, vscEndingColor.b);
-                }
+                win.webContents.send('log', "Virtual safety car ending detected!");
                 check = trackStatus;
                 break;
         }
@@ -297,23 +287,23 @@ async function controlLightsOn(brightness, r, g, b) {
     const brightnessValue = brightness;
     lightsOnCounter++;
 
-    // allLights.forEach((light) => {
-    //     const bulb = new Bulb(light);
-    //     if(debugPreference) {
-    //         console.log("Turning on light: " + light + " with brightness: " + brightnessValue + " and color: " + r + " " + g + " " + b);
-    //     }
-    //     bulb.on('connected', (lamp) => {
-    //         try {
-    //             lamp.color(r,g,b);
-    //             lamp.brightness(brightnessValue);
-    //             lamp.onn();
-    //             lamp.disconnect();
-    //         } catch (err) {
-    //             console.log(err)
-    //         }
-    //     });
-    //     bulb.connect();
-    // });
+    allLights.forEach((light) => {
+        const bulb = new Bulb(light);
+        if(debugPreference) {
+            console.log("Turning on light: " + light + " with brightness: " + brightnessValue + " and color: " + r + " " + g + " " + b);
+        }
+        bulb.on('connected', (lamp) => {
+            try {
+                lamp.color(r,g,b);
+                lamp.brightness(brightnessValue);
+                lamp.onn();
+                lamp.disconnect();
+            } catch (err) {
+                console.log(err)
+            }
+        });
+        bulb.connect();
+    });
 }
 
 
@@ -352,16 +342,16 @@ setInterval(function() {
 }, 5000)
 
 function checkApis() {
-    https.get(analyticsURL, function (res) {
-        win.webContents.send('joostapi', 'online')
+    https.get(updateURL, function (res) {
+        win.webContents.send('updateAPI', 'online')
     }).on('error', function(e) {
-        win.webContents.send('joostapi', 'offline')
+        win.webContents.send('updateAPI', 'offline')
     });
 
     http.get(url, function (res) {
-        win.webContents.send('f1mvapi', 'online')
+        win.webContents.send('f1mvAPI', 'online')
     }).on('error', function(e) {
-        win.webContents.send('f1mvapi', 'offline')
+        win.webContents.send('f1mvAPI', 'offline')
     });
 }
 

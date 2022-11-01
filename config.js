@@ -2,7 +2,7 @@ const config = {
     //begin of config file
 
     // put the url of the livetiming api here (USE THE IP OF YOUR SYSTEM, NOT LOCALHOST) (Eg. http://192.168.1.33/api/v1/live-timing/TrackStatus)
-    LiveTimingURL: 'http://192.168.0.200:10101/api/v2/live-timing/state/SessionStatus,TrackStatus',
+    LiveTimingURL: 'http://YOURIPHERE:10101/api/v2/live-timing/state/SessionStatus,TrackStatus',
     YeeLights: {
         // put all the ips of your lights here (use quotes)
         // if you have multiple lights seperated by a comma (Eg: "192.168.1.1", "192.168.1.2")
@@ -71,7 +71,7 @@ const config = {
 
     //debug mode
     // if you want to see more logs, set this to true
-    debug: true
+    debug: false
 }
 
         //end of config file
