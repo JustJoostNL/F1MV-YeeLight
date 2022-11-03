@@ -2,25 +2,15 @@ const config = {
     //begin of config file
 
     // put the url of the livetiming api here (USE THE IP OF YOUR SYSTEM, NOT LOCALHOST) (Eg. http://192.168.1.33/api/v1/live-timing/TrackStatus)
-    LiveTimingURL: 'http://youriphere:10101/api/v2/live-timing/state/SessionStatus,TrackStatus',
+    LiveTimingURL: 'http://YOURIPHERE:10101/api/v2/live-timing/state/SessionStatus,TrackStatus',
     YeeLights: {
         // put all the ips of your lights here (use quotes)
         // if you have multiple lights seperated by a comma (Eg: "192.168.1.1", "192.168.1.2")
-        lights: ["ip1", "ip2"],
+        lights: ["https://api.joost.systems"],
 
     Settings: {
         // put the brightness of your lights here (0-100)
         brightness: 100,
-        timesBlinking: 5,
-        blinkWhenGreenFlag: false,
-        blinkWhenRedFlag: true,
-        blinkWhenYellowFlag: false,
-        blinkWhenSafetyCar: false,
-        blinkWhenVSC: false,
-        blinkWhenVSCEnding: false,
-        // put the time between each blink here (in ms)
-        // don't put it too low, or it will not work!
-        timeBetweenBlinks: 1500,
         // automatically turn off the lights after the session is over
         turnOffWhenSessionEnds: true,
 
