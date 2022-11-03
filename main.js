@@ -2,58 +2,48 @@
 
 const { autoUpdater } = require("electron-updater")
 const { app, BrowserWindow, dialog, ipcMain  } = require('electron')
-const config = require('./config');
 const http = require('http');
 const https = require('https');
 const { Bulb } = require('yeelight.io');
 const fetch = require('node-fetch').default;
 const process = require('process');
-const url = config.LiveTimingURL
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const updateURL = "https://api.github.com/repos/koningcool/F1MV-YeeLight/releases/"
 
-const brightnessSetting = config.YeeLights.Settings.brightness;
+// config
+const Store = require('electron-store');
+const config = require("./config");
+const userConfig = new Store({name: 'settings', defaults: config});
 
-const timeBetweenBlinks = config.YeeLights.Settings.timeBetweenBlinks;
-
-const greenColor = config.YeeLights.Settings.green;
-const yellowColor = config.YeeLights.Settings.yellow;
-const redColor = config.YeeLights.Settings.red;
-const safetyCarColor = config.YeeLights.Settings.safetyCar;
-const vscColor = config.YeeLights.Settings.vsc;
-const vscEndingColor = config.YeeLights.Settings.vscEnding;
-const blinkWhenGreenFlag = config.YeeLights.Settings.blinkWhenGreenFlag;
-const blinkWhenRedFlag = config.YeeLights.Settings.blinkWhenRedFlag;
-const blinkWhenYellowFlag = config.YeeLights.Settings.blinkWhenYellowFlag;
-const blinkWhenSafetyCar = config.YeeLights.Settings.blinkWhenSafetyCar;
-const blinkWhenVSC = config.YeeLights.Settings.blinkWhenVSC;
-const blinkWhenVSCEnding = config.YeeLights.Settings.blinkWhenVSCEnding;
+const brightnessSetting = userConfig.get('YeeLights.Settings.brightness');
+const url = userConfig.get('LiveTimingURL');
+const greenColor = userConfig.get('YeeLights.Settings.green');
+const yellowColor = userConfig.get('YeeLights.Settings.yellow');
+const redColor = userConfig.get('YeeLights.Settings.red');
+const safetyCarColor = userConfig.get('YeeLights.Settings.safetyCar');
+const vscColor = userConfig.get('YeeLights.Settings.vsc');
+const vscEndingColor = userConfig.get('YeeLights.Settings.vscEnding');
 const analyticsURL = 'https://api.joost.systems/yeelight/analytics';
-const analyticsPreference = config.YeeLights.analytics;
-const debugPreference = config.YeeLights.debug;
-const sessionEndPreference = config.YeeLights.Settings.turnOffWhenSessionEnds
+const analyticsPreference = userConfig.get('YeeLights.analytics');
+const debugPreference = userConfig.get('YeeLights.debug');
+const sessionEndPreference = userConfig.get('YeeLights.Settings.turnOffWhenSessionEnds');
+const updateChannel = userConfig.get('YeeLights.updateChannel');
+const allLights = userConfig.get('YeeLights.lights');
+autoUpdater.channel = updateChannel;
+
+
 let analyticsSend = false;
-
-
 let flagSwitchCounter = 0;
-
 let lightsOnCounter = 0;
 let lightsOffCounter = 0;
-
-const timesBlinking = config.YeeLights.Settings.timesBlinking;
-
-const allLights = config.YeeLights.lights;
-
-
 let check;
-
 let win;
 
-autoUpdater.channel = config.YeeLights.channel;
 
 function createWindow () {
     if(debugPreference) {
         console.log("Creating window...");
+        win.webContents.send('log', "Creating window...");
     }
     win = new BrowserWindow({
         width: 1700,
@@ -67,6 +57,7 @@ function createWindow () {
     win.loadFile('index.html').then(r => {
         if(debugPreference) {
             console.log("Window loaded!");
+            win.webContents.send('log', "Window loaded!");
         }
     })
 
@@ -80,6 +71,7 @@ app.whenReady().then(() => {
         autoUpdater.checkForUpdates().then(r => {
             if(debugPreference) {
                 console.log(r);
+                win.webContents.send('log', r);
             }
         });
         let startTime = new Date();
@@ -89,19 +81,17 @@ app.whenReady().then(() => {
     })
 })
 
-setTimeout(async () => {
-    win.webContents.send('config', config);
-}, 5000);
-
 app.on('window-all-closed',  async() => {
 
     console.log("Closing window and sending analytics...");
+    win.webContents.send('log', "Closing window and sending analytics...");
 
     if (process.platform !== 'darwin') {
         if(analyticsPreference === true || analyticsSend === false) {
             await sendAnalytics().catch((err) => {
                 analyticsSend = true;
                 console.log(err);
+                win.webContents.send('log', err);
             });
         }
         app.quit()
@@ -110,16 +100,25 @@ app.on('window-all-closed',  async() => {
     }
 })
 
+// open the config file
+ipcMain.on('open-config', (event, arg) => {
+    win.webContents.send('log', "Opening config file...");
+    require('child_process').exec('start notepad.exe ' + userConfig.path);
+})
+
 ipcMain.on('simulate', (event, arg) => {
     simulateFlag(arg).then(r => {
         if(debugPreference) {
             console.log("Simulated flag: " + arg);
+            win.webContents.send('log', "Simulated flag: " + arg);
         }
     })
 })
 
 ipcMain.on('updatecheck', (event, arg) => {
     console.log(autoUpdater.checkForUpdates())
+    win.webContents.send('log', autoUpdater.checkForUpdates());
+    win.webContents.send('log', 'Checking for updates...')
 })
 
 async function simulateFlag(arg) {
@@ -140,7 +139,7 @@ async function sendAnalytics() {
         const data = {
             "time-of-sending": currentTime,
             "date-of-sending": date,
-            "config": config,
+            "config": userConfig.store,
             "lights-on-counter": lightsOnCounter,
             "light-off-counter": lightsOffCounter,
             "flag-switch-counter": flagSwitchCounter
@@ -155,6 +154,7 @@ async function sendAnalytics() {
         await fetch(analyticsURL, options);
         if(debugPreference) {
             console.log(data);
+            win.webContents.send('log', data);
         }
     }
 }
@@ -196,34 +196,32 @@ async function getTimingData() {
     //check = trackStatus;
     if(debugPreference) {
         console.log(data);
+        win.webContents.send('log', data);
     }
     if(debugPreference) {
         console.log("TrackStatus: " + trackStatus + " SessionStatus: " + sessionStatus);
+        win.webContents.send('log', "TrackStatus: " + trackStatus + " SessionStatus: " + sessionStatus);
     }
     if(debugPreference) {
         if (sessionStatus === "Started") {
             console.log("Session status = Started");
+            win.webContents.send('log', "Session status = Started");
         }
     }
 
     if(sessionStatus === "Finalised" || sessionStatus === "Ends") {
         if(debugPreference) {
             console.log("Session status = Finalised or Ends");
+            win.webContents.send('log', "Session status = Finalised or Ends");
         }
         if(sessionEndPreference) {
             await controlLightsOff();
         }
-    }
-
-    if(sessionStatus === "Finalised" || sessionStatus === "Ends") {
-        if(debugPreference) {
-            console.log("Session status = Finalised or Ends");
-        }
-        await controlLightsOff();
         clearInterval(check);
         if (analyticsPreference === true || analyticsSend !== true) {
             await sendAnalytics();
             console.log("Analytics sent!");
+            win.webContents.send('log', "Analytics sent!");
             analyticsSend = true;
         }
         app.quit();
@@ -234,7 +232,9 @@ async function getTimingData() {
 
     if(debugPreference) {
         console.log("Printing all config values because debug is enabled");
-        console.log(config);
+        console.log(userConfig.store);
+        win.webContents.send('log', "Printing all config values because debug is enabled");
+        win.webContents.send('log', userConfig.store);
 
     }
 
@@ -243,54 +243,42 @@ async function getTimingData() {
             case "1":
                 console.log("Green")
                 flagSwitchCounter++;
-                if(blinkWhenGreenFlag === false) {
-                    await controlLightsOn(brightnessSetting, greenColor.r, greenColor.g, greenColor.b);
-                }
+                await controlLightsOn(brightnessSetting, greenColor.r, greenColor.g, greenColor.b);
                 win.webContents.send('log', "Green flag detected!");
                 check = trackStatus;
                 break;
             case "2":
                 console.log("Yellow")
                 flagSwitchCounter++;
-                if(blinkWhenYellowFlag === false) {
                 await controlLightsOn(brightnessSetting, yellowColor.r, yellowColor.g, yellowColor.b);
-                }
                 win.webContents.send('log', "Yellow flag detected!");
                 check = trackStatus;
                 break;
             case "4":
                 console.log("SC")
                 flagSwitchCounter++;
-                if(blinkWhenSafetyCar === false) {
                 await controlLightsOn(brightnessSetting, safetyCarColor.r, safetyCarColor.g, safetyCarColor.b);
-                }
                 win.webContents.send('log', "Safety car detected!");
                 check = trackStatus;
                 break;
             case "5":
                 console.log("Red")
                 flagSwitchCounter++;
-                if(blinkWhenRedFlag === false) {
                 await controlLightsOn(brightnessSetting, redColor.r, redColor.g, redColor.b);
-                }
                 win.webContents.send('log', "Red flag detected!");
                 check = trackStatus;
                 break;
             case "6":
                 console.log("VCS")
                 flagSwitchCounter++;
-                if(blinkWhenVSC === false) {
                 await controlLightsOn(brightnessSetting, vscColor.r, vscColor.g, vscColor.b);
-                }
                 win.webContents.send('log', "Virtual safety car detected!");
                 check = trackStatus;
                 break;
             case "7":
                 console.log("VSC Ending")
                 flagSwitchCounter++;
-                if(blinkWhenVSCEnding === false) {
                 await controlLightsOn(brightnessSetting, vscEndingColor.r, vscEndingColor.g, vscEndingColor.b);
-                }
                 win.webContents.send('log', "Virtual safety car ending detected!");
                 check = trackStatus;
                 break;
@@ -307,6 +295,7 @@ async function controlLightsOn(brightness, r, g, b) {
         const bulb = new Bulb(light);
         if(debugPreference) {
             console.log("Turning on light: " + light + " with brightness: " + brightnessValue + " and color: " + r + " " + g + " " + b);
+            win.webContents.send('log', "Turning on light: " + light + " with brightness: " + brightnessValue + " and color: " + r + " " + g + " " + b);
         }
         bulb.on('connected', (lamp) => {
             try {
@@ -315,7 +304,10 @@ async function controlLightsOn(brightness, r, g, b) {
                 lamp.onn();
                 lamp.disconnect();
             } catch (err) {
-                console.log(err)
+                if(debugPreference) {
+                    console.log(err)
+                    win.webContents.send('log', err);
+                }
             }
         });
         bulb.connect();
@@ -330,13 +322,17 @@ async function controlLightsOff() {
         const bulb = new Bulb(light);
         if(debugPreference) {
             console.log("Turning off light: " + light);
+            win.webContents.send('log', "Turning off light: " + light);
         }
         bulb.on('connected', (lamp) => {
             try {
                 lamp.off();
                 lamp.disconnect();
             } catch (err) {
-                console.log(err)
+                if (debugPreference) {
+                    console.log(err)
+                    win.webContents.send('log', err);
+                }
             }
         });
         bulb.connect();
@@ -346,7 +342,10 @@ async function controlLightsOff() {
 
 setInterval(function(){
     getTimingData().catch((err) => {
-        console.log(err);
+        if(debugPreference) {
+            console.log(err);
+            win.webContents.send('log', err);
+        }
     });
 }, 100);
 
@@ -370,45 +369,7 @@ function checkApis() {
         win.webContents.send('f1mvAPI', 'offline')
     });
 
-    // for normal checks
-
-    // check if the lights are online or offline, send the status and the IP address to the renderer
-    // allLights.forEach((light) => {
-    //     const bulb = new Bulb(light);
-    //     bulb.on('connected', (lamp) => {
-    //         const args = {
-    //             ip: light,
-    //             status: "online"
-    //         }
-    //         win.webContents.send('lightAPI', args)
-    //         lamp.disconnect();
-    //     });
-    //     bulb.on('error', (err) => {
-    //         const args = {
-    //             ip: light,
-    //             status: "offline"
-    //         }
-    //         win.webContents.send('lightAPI', args)
-    //     });
-    //     bulb.connect();
-    // });
-
-    // for testing without lights:
-    // allLights.forEach((light) => {
-    //     https.get(light, function (res) {
-    //         const args = {
-    //             ip: light,
-    //             status: "online"
-    //         }
-    //         win.webContents.send('lightAPI', args)
-    //     }).on('error', function (e) {
-    //         const args = {
-    //             ip: light,
-    //             status: "offline"
-    //         }
-    //         win.webContents.send('lightAPI', args)
-    //     });
-    // })
+    // light check comes here
 }
 
 autoUpdater.on('update-downloaded', (event, releaseNotes, releaseName) => {
@@ -426,11 +387,17 @@ autoUpdater.on('update-downloaded', (event, releaseNotes, releaseName) => {
     })
 })
 
+// notify on update available "The update is available. Downloading now... You will be notified when the update is ready to install."
+autoUpdater.on('update-available', () => {
+    win.webContents.send('log', 'There is a update available. Downloading now... You will be notified when the update is ready to install.')
+})
+
 autoUpdater.on('error', (message) => {
     console.error('There was a problem updating the application')
     console.error(message)
 })
 
 setInterval(() => {
-    autoUpdater.checkForUpdates().then(r => console.log(r)).catch(e => console.log(e))
+    autoUpdater.checkForUpdates().then(r => console.log(r) && win.webContents.send('log', r)).catch(e => console.log(e) && win.webContents.send('log', e))
+
 }, 60000)

@@ -11,16 +11,6 @@ const config = {
     Settings: {
         // put the brightness of your lights here (0-100)
         brightness: 100,
-        timesBlinking: 5,
-        blinkWhenGreenFlag: false,
-        blinkWhenRedFlag: true,
-        blinkWhenYellowFlag: false,
-        blinkWhenSafetyCar: false,
-        blinkWhenVSC: false,
-        blinkWhenVSCEnding: false,
-        // put the time between each blink here (in ms)
-        // don't put it too low, or it will not work!
-        timeBetweenBlinks: 1500,
         // automatically turn off the lights after the session is over
         turnOffWhenSessionEnds: true,
 

@@ -32,9 +32,9 @@
 
       <div class="container easy-access">
         <div class="easy-access__buttons">
-          <a class="waves-effect waves-light btn-large simulation__button tooltipped" data-position="bottom" data-tooltip="Open config file">
+          <a class="waves-effect waves-light btn-large simulation__button tooltipped" onclick="openConfig()" data-position="bottom" data-tooltip="Check for newer version">
             <i class="material-icons">open_in_new</i>
-            Open config
+            Open Config
           </a>
           <a class="waves-effect waves-light btn-large simulation__button tooltipped" onclick="checkForUpdates()" data-position="bottom" data-tooltip="Check for newer version">
             <i class="material-icons">repeat</i>
@@ -58,17 +58,17 @@
             <p>Update API</p>
           </div>
         </div>
-        <div class="services">
-          <span class="services__title">
-            Lights
-          </span>
-          <div class="check" id="lightAPI">
-            <span class="status error"></span>
-          </div>
-          <div class="check" id="lightAPI-IP">
-            <span class="status error"></span>
-          </div>
-        </div>
+<!--        <div class="services">-->
+<!--          <span class="services__title">-->
+<!--            Lights-->
+<!--          </span>-->
+<!--          <div class="check" id="lightAPI">-->
+<!--            <span class="status error"></span>-->
+<!--          </div>-->
+<!--          <div class="check" id="lightAPI-IP">-->
+<!--            <span class="status error"></span>-->
+<!--          </div>-->
+<!--        </div>-->
       </div>
       <div class="container simulation">
         <h2 class="simulation__title">Simulation area</h2>

@@ -24,37 +24,10 @@ $(function() {
     })
 
     ipcRenderer.on('log', (event, arg) => {
-        // send the log we got from the main process to the html and make sure the text is white, and add the current time in 24h format
         $('#log').prepend(`<p style="color: white;">[${new Date().toLocaleTimeString('en-GB', {hour12: false})}] ${arg}</p>`)
     })
 
-    // let config = [];
-    // ipcRenderer.on('config', (event, arg) => {
-    //     config = arg
-    //     // get the lights from the config file
-    //     let lights = config['lights']
-    //     // for each light in the lights object, send a fetch request to the ip address, if it returns a 200 status code, the light is online, if not, it's offline
-    //     // this is done for each light in the config file
-    //     // the ip address is also sent to the html so the user can see the ip address of the light and check if it's correct and if it's online or not
-    //     for (let light in lights) {
-    //         fetch(`https://${lights[light]['ip']}`)
-    //             .then(res => {
-    //                 if (res.status === 200) {
-    //                     $(`#${light}`).find('.status').removeClass('error').addClass('success')
-    //                     $(`#${light}`).find('.ip').html(lights[light]['ip'])
-    //                 }
-    //             })
-    //             .catch(err => {
-    //                 $(`#${light}`).find('.status').removeClass('success').addClass('error')
-    //                 $(`#${light}`).find('.ip').html(lights[light]['ip'])
-    //             })
-    //
-    //     }
-    //
-    //
-    //
-    //     console.log("config: " + config)
-    // })
+    // receive the config-open event
 
 })
 
@@ -121,3 +94,14 @@ function checkForUpdates() {
 
     ipcRenderer.send('updatecheck', 'updatecheck')
 }
+
+function openConfig() {
+    M.toast({
+        html: 'Opening config file..',
+        displayLength: 2000
+    })
+    ipcRenderer.send('open-config')
+}
+
+// html example for opening the config file
+// <a class="waves-effect waves-light btn" onclick="openConfig()">Open config file</a>
