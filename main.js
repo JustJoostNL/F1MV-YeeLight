@@ -40,6 +40,106 @@ let check;
 let win;
 
 
+// when the config is missing values, this function will add them
+function checkConfig() {
+    if (!userConfig.has('YeeLights.Settings.brightness')) {
+        userConfig.set('YeeLights.Settings.brightness', 100);
+    }
+    if (!userConfig.has('YeeLights.Settings.green')) {
+        userConfig.set('YeeLights.Settings.green', [0, 255, 0]);
+    }
+    if (!userConfig.has('YeeLights.Settings.yellow')) {
+        userConfig.set('YeeLights.Settings.yellow', [255, 255, 0]);
+    }
+    if (!userConfig.has('YeeLights.Settings.red')) {
+        userConfig.set('YeeLights.Settings.red', [255, 0, 0]);
+    }
+    if (!userConfig.has('YeeLights.Settings.safetyCar')) {
+        userConfig.set('YeeLights.Settings.safetyCar', [255, 255, 255]);
+    }
+    if (!userConfig.has('YeeLights.Settings.vsc')) {
+        userConfig.set('YeeLights.Settings.vsc', [255, 0, 255]);
+    }
+    if (!userConfig.has('YeeLights.Settings.vscEnding')) {
+        userConfig.set('YeeLights.Settings.vscEnding', [255, 255, 0]);
+    }
+    if (!userConfig.has('YeeLights.Settings.turnOffWhenSessionEnds')) {
+        userConfig.set('YeeLights.Settings.turnOffWhenSessionEnds', true);
+    }
+    if (!userConfig.has('YeeLights.lights')) {
+        userConfig.set('YeeLights.lights', ['ip1', 'ip2']);
+    }
+    if (!userConfig.has('YeeLights.analytics')) {
+        userConfig.set('YeeLights.analytics', true);
+    }
+    if (!userConfig.has('YeeLights.debug')) {
+        userConfig.set('YeeLights.debug', false);
+    }
+    if (!userConfig.has('YeeLights.updateChannel')) {
+        userConfig.set('YeeLights.updateChannel', 'latest');
+    }
+}
+
+// migrate old config to new config
+function migrateConfig() {
+    if(userConfig.has('YeeLights.Settings.brightness')) {
+        userConfig.set('YeeLights.Settings.brightness', userConfig.get('YeeLights.Settings.brightness'));
+    }
+    if(userConfig.has('LiveTimingURL')) {
+        userConfig.set('LiveTimingURL', userConfig.get('LiveTimingURL'));
+    }
+    if(userConfig.has('YeeLights.Settings.green')) {
+        userConfig.set('YeeLights.Settings.green', userConfig.get('YeeLights.Settings.green'));
+    }
+    if(userConfig.has('YeeLights.Settings.yellow')) {
+        userConfig.set('YeeLights.Settings.yellow', userConfig.get('YeeLights.Settings.yellow'));
+    }
+    if(userConfig.has('YeeLights.Settings.red')) {
+        userConfig.set('YeeLights.Settings.red', userConfig.get('YeeLights.Settings.red'));
+    }
+    if(userConfig.has('YeeLights.Settings.safetyCar')) {
+        userConfig.set('YeeLights.Settings.safetyCar', userConfig.get('YeeLights.Settings.safetyCar'));
+    }
+    if(userConfig.has('YeeLights.Settings.vsc')) {
+        userConfig.set('YeeLights.Settings.vsc', userConfig.get('YeeLights.Settings.vsc'));
+    }
+    if(userConfig.has('YeeLights.Settings.vscEnding')) {
+        userConfig.set('YeeLights.Settings.vscEnding', userConfig.get('YeeLights.Settings.vscEnding'));
+    }
+    if(userConfig.has('YeeLights.Settings.turnOffWhenSessionEnds')) {
+        userConfig.set('YeeLights.Settings.turnOffWhenSessionEnds', userConfig.get('YeeLights.Settings.turnOffWhenSessionEnds'));
+    }
+    if(userConfig.has('YeeLights.lights')) {
+        userConfig.set('YeeLights.lights', userConfig.get('YeeLights.lights'));
+    }
+    if(userConfig.has('YeeLights.analytics')) {
+        userConfig.set('YeeLights.analytics', userConfig.get('YeeLights.analytics'));
+    }
+    if(userConfig.has('YeeLights.debug')) {
+        userConfig.set('YeeLights.debug', userConfig.get('YeeLights.debug'));
+    }
+    if(userConfig.has('YeeLights.updateChannel')) {
+        userConfig.set('YeeLights.updateChannel', userConfig.get('YeeLights.updateChannel'));
+    }
+}
+
+// check if config is old or new using the config version
+function checkConfigVersion() {
+    if (!userConfig.has('YeeLights.configVersion')) {
+        userConfig.set('YeeLights.configVersion', 1);
+        migrateConfig();
+    } else {
+        if (userConfig.get('YeeLights.configVersion') === 1) {
+            migrateConfig();
+            setTimeout(() => {
+                userConfig.set('YeeLights.configVersion', 2);
+            }, 2000);
+        }
+    }
+}
+
+
+
 function createWindow () {
     if(debugPreference) {
         console.log("Creating window...");
@@ -66,6 +166,8 @@ app.whenReady().then(() => {
     createWindow()
 
     app.on('activate', () => {
+        checkConfig();
+        checkConfigVersion();
         autoUpdater.checkForUpdates().then(r => {
             if(debugPreference) {
                 console.log(r);
