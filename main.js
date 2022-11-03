@@ -160,8 +160,6 @@ function createWindow () {
             win.webContents.send('log', "Window loaded!");
         }
     })
-
-    win.webContents.openDevTools()
 }
 
 app.whenReady().then(() => {
@@ -181,6 +179,11 @@ app.whenReady().then(() => {
             createWindow()
         }
     })
+
+    // TODO: More stable solution.
+    setTimeout(() => {
+        win.webContents.send('config', config);
+    }, 500);
 })
 
 app.on('window-all-closed',  async() => {
@@ -470,8 +473,6 @@ function checkApis() {
     }).on('error', function (e) {
         win.webContents.send('f1mvAPI', 'offline')
     });
-
-    // light check comes here
 }
 
 autoUpdater.on('update-downloaded', (event, releaseNotes, releaseName) => {
@@ -501,5 +502,4 @@ autoUpdater.on('error', (message) => {
 
 setInterval(() => {
     autoUpdater.checkForUpdates().then(r => console.log(r) && win.webContents.send('log', r)).catch(e => console.log(e) && win.webContents.send('log', e))
-
 }, 60000)
