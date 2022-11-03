@@ -64,7 +64,11 @@ function createWindow () {
         }
     })
 
-    win.loadFile('index.html')
+    win.loadFile('index.html').then(r => {
+        if(debugPreference) {
+            console.log("Window loaded!");
+        }
+    })
 
     win.webContents.openDevTools()
 }
@@ -73,13 +77,21 @@ app.whenReady().then(() => {
     createWindow()
 
     app.on('activate', () => {
-        autoUpdater.checkForUpdates();
+        autoUpdater.checkForUpdates().then(r => {
+            if(debugPreference) {
+                console.log(r);
+            }
+        });
         let startTime = new Date();
         if (BrowserWindow.getAllWindows().length === 0) {
             createWindow()
         }
     })
 })
+
+setTimeout(async () => {
+    win.webContents.send('config', config);
+}, 5000);
 
 app.on('window-all-closed',  async() => {
 
@@ -99,7 +111,11 @@ app.on('window-all-closed',  async() => {
 })
 
 ipcMain.on('simulate', (event, arg) => {
-    simulateFlag(arg)
+    simulateFlag(arg).then(r => {
+        if(debugPreference) {
+            console.log("Simulated flag: " + arg);
+        }
+    })
 })
 
 ipcMain.on('updatecheck', (event, arg) => {
@@ -344,15 +360,55 @@ setInterval(function() {
 function checkApis() {
     https.get(updateURL, function (res) {
         win.webContents.send('updateAPI', 'online')
-    }).on('error', function(e) {
+    }).on('error', function (e) {
         win.webContents.send('updateAPI', 'offline')
     });
 
     http.get(url, function (res) {
         win.webContents.send('f1mvAPI', 'online')
-    }).on('error', function(e) {
+    }).on('error', function (e) {
         win.webContents.send('f1mvAPI', 'offline')
     });
+
+    // for normal checks
+
+    // check if the lights are online or offline, send the status and the IP address to the renderer
+    // allLights.forEach((light) => {
+    //     const bulb = new Bulb(light);
+    //     bulb.on('connected', (lamp) => {
+    //         const args = {
+    //             ip: light,
+    //             status: "online"
+    //         }
+    //         win.webContents.send('lightAPI', args)
+    //         lamp.disconnect();
+    //     });
+    //     bulb.on('error', (err) => {
+    //         const args = {
+    //             ip: light,
+    //             status: "offline"
+    //         }
+    //         win.webContents.send('lightAPI', args)
+    //     });
+    //     bulb.connect();
+    // });
+
+    // for testing without lights:
+    // allLights.forEach((light) => {
+    //     https.get(light, function (res) {
+    //         const args = {
+    //             ip: light,
+    //             status: "online"
+    //         }
+    //         win.webContents.send('lightAPI', args)
+    //     }).on('error', function (e) {
+    //         const args = {
+    //             ip: light,
+    //             status: "offline"
+    //         }
+    //         win.webContents.send('lightAPI', args)
+    //     });
+    // })
 }
 
 autoUpdater.on('update-downloaded', (event, releaseNotes, releaseName) => {
@@ -376,5 +432,5 @@ autoUpdater.on('error', (message) => {
 })
 
 setInterval(() => {
-    autoUpdater.checkForUpdates()
+    autoUpdater.checkForUpdates().then(r => console.log(r)).catch(e => console.log(e))
 }, 60000)

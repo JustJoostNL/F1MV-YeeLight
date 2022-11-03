@@ -60,6 +60,7 @@ nav {
     overflow-y: scroll;
     border: 1px solid #404040;
     padding: 15px;
+    position: relative;
 }
 
 .logs p {
@@ -86,6 +87,8 @@ nav {
     font-weight: 600;
     font-size: 26px;
     margin-top: 45px;
+    Display: flex;
+    Align-items: center;
 }
 
 .checks {
@@ -115,14 +118,39 @@ nav {
     margin-right: 15px;
 }
 
+.status.special {
+    display: flex;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    box-shadow: 0px 0px 1px 1px #0000001a;
+    margin-right: 15px;
+    position: absolute;
+    right: 0;
+}
+
 .status.success {
     animation: pulse-success 2s infinite;
     background-color: #78fc65;
 }
 
+.status.success.special {
+    animation: pulse-success 2s infinite;
+    background-color: #78fc65;
+    position: absolute;
+    right: 0;
+}
+
 .status.error {
     animation: pulse-error 2s infinite;
     background-color: var(--red);
+}
+
+.status.error.special {
+    animation: pulse-error 2s infinite;
+    background-color: var(--red);
+    position: absolute;
+    right: 0;
 }
 
 .services__title {
