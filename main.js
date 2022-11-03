@@ -60,8 +60,6 @@ function createWindow () {
             win.webContents.send('log', "Window loaded!");
         }
     })
-
-    win.webContents.openDevTools()
 }
 
 app.whenReady().then(() => {
@@ -79,6 +77,12 @@ app.whenReady().then(() => {
             createWindow()
         }
     })
+
+    // TODO: More stable solution.
+    setTimeout(() => {
+        win.webContents.openDevTools()
+        win.webContents.send('config', config);
+    }, 500);
 })
 
 app.on('window-all-closed',  async() => {
@@ -291,27 +295,27 @@ async function controlLightsOn(brightness, r, g, b) {
     const brightnessValue = brightness;
     lightsOnCounter++;
 
-    allLights.forEach((light) => {
-        const bulb = new Bulb(light);
-        if(debugPreference) {
-            console.log("Turning on light: " + light + " with brightness: " + brightnessValue + " and color: " + r + " " + g + " " + b);
-            win.webContents.send('log', "Turning on light: " + light + " with brightness: " + brightnessValue + " and color: " + r + " " + g + " " + b);
-        }
-        bulb.on('connected', (lamp) => {
-            try {
-                lamp.color(r,g,b);
-                lamp.brightness(brightnessValue);
-                lamp.onn();
-                lamp.disconnect();
-            } catch (err) {
-                if(debugPreference) {
-                    console.log(err)
-                    win.webContents.send('log', err);
-                }
-            }
-        });
-        bulb.connect();
-    });
+    // allLights.forEach((light) => {
+    //     const bulb = new Bulb(light);
+    //     if(debugPreference) {
+    //         console.log("Turning on light: " + light + " with brightness: " + brightnessValue + " and color: " + r + " " + g + " " + b);
+    //         win.webContents.send('log', "Turning on light: " + light + " with brightness: " + brightnessValue + " and color: " + r + " " + g + " " + b);
+    //     }
+    //     bulb.on('connected', (lamp) => {
+    //         try {
+    //             lamp.color(r,g,b);
+    //             lamp.brightness(brightnessValue);
+    //             lamp.onn();
+    //             lamp.disconnect();
+    //         } catch (err) {
+    //             if(debugPreference) {
+    //                 console.log(err)
+    //                 win.webContents.send('log', err);
+    //             }
+    //         }
+    //     });
+    //     bulb.connect();
+    // });
 }
 
 
@@ -368,8 +372,6 @@ function checkApis() {
     }).on('error', function (e) {
         win.webContents.send('f1mvAPI', 'offline')
     });
-
-    // light check comes here
 }
 
 autoUpdater.on('update-downloaded', (event, releaseNotes, releaseName) => {
@@ -399,5 +401,4 @@ autoUpdater.on('error', (message) => {
 
 setInterval(() => {
     autoUpdater.checkForUpdates().then(r => console.log(r) && win.webContents.send('log', r)).catch(e => console.log(e) && win.webContents.send('log', e))
-
 }, 60000)
