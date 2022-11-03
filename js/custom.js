@@ -1,7 +1,8 @@
 const { ipcRenderer } = require('electron');
+let config = [];
+
 $(function() {
     ipcRenderer.on('f1mvAPI', (event, arg) => {
-        console.log(arg)
         if (arg === 'online') {
             $('#f1mv').find('.status').removeClass('error').addClass('success')
         }
@@ -12,7 +13,6 @@ $(function() {
     })
 
     ipcRenderer.on('updateAPI', (event, arg) => {
-        console.log(arg)
         if (arg === 'online') {
             $('#updateAPI').find('.status').removeClass('error').addClass('success')
         }
@@ -20,7 +20,6 @@ $(function() {
         if (arg === 'offline') {
             $('#updateAPI').find('.status').removeClass('success').addClass('error')
         }
-
     })
 
     ipcRenderer.on('log', (event, arg) => {
@@ -28,7 +27,27 @@ $(function() {
     })
 
     // receive the config-open event
+    ipcRenderer.on('config', (event, arg) => {
+        console.log('recieved config.')
+        config = arg;
 
+        console.log(1)
+        config.YeeLights.lights.forEach(function(light) {
+            console.log(light)
+
+            $('#lights').append(`<div class="check" id="${light}"><span class="status error"></span><p>${light}</p></div>`)
+        })
+    })
+
+    // TODO: Create event.
+    ipcRenderer.on('lightchange', (event, arg) => {
+       if (arg.status === 'online') {
+            $(`#${arg.lightIP}`).find('.status').removeClass('error').addClass('success')
+       }
+       if (arg.status === 'offline') {
+        $(`#${arg.lightIP}`).find('.status').removeClass('success').addClass('error')
+   }
+    })
 })
 
 
