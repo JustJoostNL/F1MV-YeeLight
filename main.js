@@ -192,7 +192,7 @@ app.on('window-all-closed',  async() => {
     win.webContents.send('log', "Closing window and sending analytics...");
 
     if (process.platform !== 'darwin') {
-        if(analyticsPreference === true || analyticsSend === false) {
+        if(analyticsPreference === true && analyticsSend === false) {
             await sendAnalytics().catch((err) => {
                 analyticsSend = true;
                 console.log(err);
@@ -323,7 +323,7 @@ async function getTimingData() {
             await controlLightsOff();
         }
         clearInterval(check);
-        if (analyticsPreference === true || analyticsSend !== true) {
+        if (analyticsPreference === true && analyticsSend !== true) {
             await sendAnalytics();
             console.log("Analytics sent!");
             win.webContents.send('log', "Analytics sent!");
@@ -346,42 +346,42 @@ async function getTimingData() {
     if (check !== trackStatus && sessionStatus !== "Ends" && sessionStatus !== "Finalised") {
         switch (trackStatus) {
             case "1":
-                console.log("Green")
+                console.log("Green flag!")
                 flagSwitchCounter++;
                 await controlLightsOn(brightnessSetting, greenColor.r, greenColor.g, greenColor.b);
                 win.webContents.send('log', "Green flag detected!");
                 check = trackStatus;
                 break;
             case "2":
-                console.log("Yellow")
+                console.log("Yellow flag!")
                 flagSwitchCounter++;
                 await controlLightsOn(brightnessSetting, yellowColor.r, yellowColor.g, yellowColor.b);
                 win.webContents.send('log', "Yellow flag detected!");
                 check = trackStatus;
                 break;
             case "4":
-                console.log("SC")
+                console.log("Safety car!")
                 flagSwitchCounter++;
                 await controlLightsOn(brightnessSetting, safetyCarColor.r, safetyCarColor.g, safetyCarColor.b);
                 win.webContents.send('log', "Safety car detected!");
                 check = trackStatus;
                 break;
             case "5":
-                console.log("Red")
+                console.log("Red flag!")
                 flagSwitchCounter++;
                 await controlLightsOn(brightnessSetting, redColor.r, redColor.g, redColor.b);
                 win.webContents.send('log', "Red flag detected!");
                 check = trackStatus;
                 break;
             case "6":
-                console.log("VCS")
+                console.log("Virtual Safety Car!")
                 flagSwitchCounter++;
                 await controlLightsOn(brightnessSetting, vscColor.r, vscColor.g, vscColor.b);
                 win.webContents.send('log', "Virtual safety car detected!");
                 check = trackStatus;
                 break;
             case "7":
-                console.log("VSC Ending")
+                console.log("Virtual Safety Car Ending!")
                 flagSwitchCounter++;
                 await controlLightsOn(brightnessSetting, vscEndingColor.r, vscEndingColor.g, vscEndingColor.b);
                 win.webContents.send('log', "Virtual safety car ending detected!");
