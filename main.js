@@ -473,6 +473,18 @@ function checkApis() {
     }).on('error', function (e) {
         win.webContents.send('f1mvAPI', 'offline')
     });
+    // check if the light ips are working and send the result to the renderer with the status and ip address as object using the win.webContents.send function
+    allLights.forEach((light) => {
+        const bulb = new Bulb(light);
+        bulb.on('connected', (lamp) => {
+            win.webContents.send('lightAPI', {status: 'online', ip: light});
+            lamp.disconnect();
+        });
+        bulb.on('error', (err) => {
+            win.webContents.send('lightAPI', {status: 'offline', ip: light});
+        });
+        bulb.connect();
+    });
 }
 
 autoUpdater.on('update-downloaded', (event, releaseNotes, releaseName) => {
