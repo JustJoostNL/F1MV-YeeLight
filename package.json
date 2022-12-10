@@ -1,6 +1,6 @@
 {
   "name": "F1MV-YeeLight",
-  "version": "1.6.1-beta",
+  "version": "1.6.3",
   "description": "Connect your YeeLights to your F1MV",
   "author": "koningcool",
   "main": "main.js",
