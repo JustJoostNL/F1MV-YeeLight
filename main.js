@@ -189,16 +189,8 @@ app.whenReady().then(() => {
 app.on('window-all-closed',  async() => {
 
     console.log("Closing window and sending analytics...");
-    win.webContents.send('log', "Closing window and sending analytics...");
-
+    await sendAnalytics();
     if (process.platform !== 'darwin') {
-        if(analyticsPreference === true && analyticsSend === false) {
-            await sendAnalytics().catch((err) => {
-                analyticsSend = true;
-                console.log(err);
-                win.webContents.send('log', err);
-            });
-        }
         app.quit()
 
 
@@ -233,7 +225,7 @@ async function simulateFlag(arg) {
 
 
 async function sendAnalytics() {
-    if(analyticsPreference) {
+    if(analyticsPreference && !analyticsSend) {
         const currentTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: "2-digit", hour12: false });
         const currentDate = new Date()
         const day = currentDate.getDate()
@@ -259,8 +251,8 @@ async function sendAnalytics() {
         await fetch(analyticsURL, options);
         if(debugPreference) {
             console.log(data);
-            win.webContents.send('log', data);
         }
+        analyticsSend = true;
     }
 }
 
